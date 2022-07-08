@@ -47,6 +47,7 @@ async function getMissedWar() {
     .catch((error) => error);
 
   // find all decks used
+  console.log("data", data);
   const missedDecks = data.clan.participants.filter((participant) => {
     if (participant.decksUsedToday < 4 && participant.decksUsedToday > 0)
       return true;
