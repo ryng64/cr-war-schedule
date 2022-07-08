@@ -16,7 +16,7 @@ client.on("ready", async () => {
   console.log("Missed Wars Schedule Running");
   const channel = await client.channels
     //fetch different channel id for appropriate channel.
-    .fetch(testChannel)
+    .fetch(botChannelID)
     .then((channel) => channel)
     .catch(console.error);
   const missed = await getMissedWar();
@@ -78,7 +78,11 @@ function makeMissedEmbed(missed) {
     .setDescription("less than 4 war decks were played")
     .addFields(missedDecks)
     .setTimestamp()
-    .setFooter({ text: `please make all decks 🙏` });
+    .setFooter({
+      text: `${
+        !missedDecks.length ? "No missed Decks" : "please make all decks 🙏"
+      }`,
+    });
   const missedDays = missed.missedDays.map((md) => {
     return {
       name: `${md.tag} - ${md.name}`,
@@ -95,7 +99,13 @@ function makeMissedEmbed(missed) {
     .setDescription("Missed all 4 decks")
     .addFields(missedDays)
     .setTimestamp()
-    .setFooter({ text: `please make all decks 🙏 Warnings may be issued ⚠` });
+    .setFooter({
+      text: `${
+        !missedDays.length
+          ? "No Complete misses!"
+          : "please make all decks 🙏 Warnings may be issued ⚠"
+      }`,
+    });
 
   return { missedDeckEmbed, missedDaysEmbed };
 }
