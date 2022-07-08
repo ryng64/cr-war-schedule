@@ -16,7 +16,7 @@ client.on("ready", async () => {
   console.log("Missed Wars Schedule Running");
   const channel = await client.channels
     //fetch different channel id for appropriate channel.
-    .fetch(botChannelID)
+    .fetch(testChannel)
     .then((channel) => channel)
     .catch(console.error);
   const missed = await getMissedWar();
@@ -30,7 +30,7 @@ client.on("ready", async () => {
   }, 10000);
 });
 
-client.login(process.env.DISCORDTOKEN);
+client.login(process.env.DISCORDDEV);
 
 async function getMissedWar() {
   const data = await fetch(
