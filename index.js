@@ -71,6 +71,9 @@ function makeMissedEmbed(missed) {
   const missedDeckEmbed = new MessageEmbed()
     .setColor("#ffeb3b")
     .setTitle("Decks Missed")
+    .setThumbnail(
+      "https://static.wikia.nocookie.net/clashroyale/images/9/9f/War_Shield.png/revision/latest/scale-to-width-down/250?cb=20180425130200"
+    )
     .setDescription("less than 4 war decks were played")
     .addFields(missedDecks)
     .setTimestamp()
@@ -85,6 +88,9 @@ function makeMissedEmbed(missed) {
   const missedDaysEmbed = new MessageEmbed()
     .setColor("#d32f2f")
     .setTitle("Day Missed")
+    .setThumbnail(
+      "https://static.wikia.nocookie.net/clashroyale/images/9/9f/War_Shield.png/revision/latest/scale-to-width-down/250?cb=20180425130200"
+    )
     .setDescription("Missed all 4 decks")
     .addFields(missedDays)
     .setTimestamp()
