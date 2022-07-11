@@ -16,7 +16,7 @@ client.on("ready", async () => {
   console.log("Missed Wars Schedule Running");
   const channel = await client.channels
     //fetch different channel id for appropriate channel.
-    .fetch(botChannelID)
+    .fetch(testChannel)
     .then((channel) => channel)
     .catch(console.error);
   const missed = await getMissedWar();
@@ -78,14 +78,13 @@ function makeMissedEmbed(missed) {
       inline: false,
     };
   } else {
-    missedDecks = [
-      {
-        name: "Attacks remaining",
-        value: "No remaining attacks",
-        inline: false,
-      },
-    ];
+    missedDecks = {
+      name: "Attacks remaining",
+      value: "No remaining attacks",
+      inline: false,
+    };
   }
+
   const missedDeckEmbed = new MessageEmbed()
     .setColor("#ffeb3b")
     .setTitle("War Day | Attack(s) Remaining")
@@ -97,7 +96,9 @@ function makeMissedEmbed(missed) {
     .setTimestamp()
     .setFooter({
       text: `${
-        !missedDecks.length ? "No missed Decks" : "please make all decks 🙏"
+        missedDecks.value == "No remaining attacks"
+          ? "No missed Decks"
+          : "please make all decks 🙏"
       }`,
     });
 
@@ -111,13 +112,11 @@ function makeMissedEmbed(missed) {
       inline: false,
     };
   } else {
-    missedDays = [
-      {
-        name: "All Attacks remaining",
-        value: "No members missed all attacks! 🎉",
-        inline: false,
-      },
-    ];
+    missedDays = {
+      name: "All Attacks remaining",
+      value: "No members missed all attacks! 🎉",
+      inline: false,
+    };
   }
 
   const missedDaysEmbed = new MessageEmbed()
@@ -131,7 +130,7 @@ function makeMissedEmbed(missed) {
     .setTimestamp()
     .setFooter({
       text: `${
-        !missedDays.length
+        missedDays.value == "No members missed all attacks! 🎉"
           ? "No Complete misses!"
           : "please make all decks 🙏 Warnings may be issued unless excused ⚠"
       }`,
