@@ -16,7 +16,7 @@ client.on("ready", async () => {
   console.log("Missed Wars Schedule Running");
   const channel = await client.channels
     //fetch different channel id for appropriate channel.
-    .fetch(testChannel)
+    .fetch(botChannelID)
     .then((channel) => channel)
     .catch(console.error);
   const missed = await getMissedWar();
@@ -46,14 +46,36 @@ async function getMissedWar() {
     .then((data) => data)
     .catch((error) => error);
 
+  //get active members
+  const activeMembers = await fetch(
+    `https://api.clashroyale.com/v1/clans/%23${clanTag}`,
+    {
+      method: "GET",
+      headers: new Headers({
+        Authorization: `Bearer ${process.env.CRTOKEN}`,
+      }),
+    }
+  )
+    .then((response) => response.json())
+    .then((data) => data.memberList.map((member) => member.tag))
+    .catch((error) => error);
+
   // find all decks used
   const missedDecks = data.clan.participants.filter((participant) => {
-    if (participant.decksUsedToday < 4 && participant.decksUsedToday > 0)
+    if (
+      participant.decksUsedToday < 4 &&
+      participant.decksUsedToday > 0 &&
+      activeMembers.includes(participant.tag)
+    )
       return true;
   });
 
   const missedDays = data.clan.participants.filter((participant) => {
-    if (participant.decksUsedToday == 0) return true;
+    if (
+      participant.decksUsedToday == 0 &&
+      activeMembers.includes(participant.tag)
+    )
+      return true;
   });
 
   return { missedDecks, missedDays };
