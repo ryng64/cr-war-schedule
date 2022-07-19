@@ -11,7 +11,7 @@ const client = new Discord.Client({
   intents: ["GUILDS", "GUILD_MESSAGES"],
 });
 
-client.on("ready", async () => {
+client.once("ready", async () => {
   console.log(`Logged in as ${client.user.tag}`);
   console.log("Missed Wars Schedule Running");
   const channel = await client.channels
