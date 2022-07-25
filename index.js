@@ -14,13 +14,22 @@ const client = new Discord.Client({
 client.once("ready", async () => {
   console.log(`Logged in as ${client.user.tag}`);
   console.log("Missed Wars Schedule Running");
+
   const channel = await client.channels
     //fetch different channel id for appropriate channel.
     .fetch(botChannelID)
     .then((channel) => channel)
     .catch(console.error);
-  const missed = await getMissedWar();
+
+  //Get Members and missed war
+  const activeMembers = await getActiveMembers();
+  const missed = await getMissedWar(activeMembers);
   const missedEmbeds = makeMissedEmbed(missed);
+
+  //findorcreate the members in the database
+  //check current members
+
+  //Send the Discord Message
   channel.send({
     embeds: [missedEmbeds.missedDeckEmbed, missedEmbeds.missedDaysEmbed],
   });
@@ -32,7 +41,7 @@ client.once("ready", async () => {
 
 client.login(process.env.DISCORDDEV);
 
-async function getMissedWar() {
+async function getMissedWar(members) {
   const data = await fetch(
     `https://api.clashroyale.com/v1/clans/%23${clanTag}/currentriverrace`,
     {
@@ -47,8 +56,33 @@ async function getMissedWar() {
     .catch((error) => error);
 
   //get active members
+  // const activeMembers = await getActiveMembers();
+  const membersTags = members.map((member) => member.tag);
+
+  // find all decks used
+  const missedDecks = data.clan.participants.filter((participant) => {
+    if (
+      participant.decksUsedToday < 4 &&
+      participant.decksUsedToday > 0 &&
+      membersTags.includes(participant.tag)
+    )
+      return true;
+  });
+
+  const missedDays = data.clan.participants.filter((participant) => {
+    if (
+      participant.decksUsedToday == 0 &&
+      membersTags.includes(participant.tag)
+    )
+      return true;
+  });
+
+  return { missedDecks, missedDays };
+}
+
+async function getActiveMembers() {
   const activeMembers = await fetch(
-    `https://api.clashroyale.com/v1/clans/%23${clanTag}`,
+    `https://api.clashroyale.com/v1/clans/%23${clanTag}/members`,
     {
       method: "GET",
       headers: new Headers({
@@ -57,28 +91,9 @@ async function getMissedWar() {
     }
   )
     .then((response) => response.json())
-    .then((data) => data.memberList.map((member) => member.tag))
+    .then((data) => data.items)
     .catch((error) => error);
-
-  // find all decks used
-  const missedDecks = data.clan.participants.filter((participant) => {
-    if (
-      participant.decksUsedToday < 4 &&
-      participant.decksUsedToday > 0 &&
-      activeMembers.includes(participant.tag)
-    )
-      return true;
-  });
-
-  const missedDays = data.clan.participants.filter((participant) => {
-    if (
-      participant.decksUsedToday == 0 &&
-      activeMembers.includes(participant.tag)
-    )
-      return true;
-  });
-
-  return { missedDecks, missedDays };
+  return activeMembers;
 }
 
 //creates an discord embed message for both missed Decks and missed Days
